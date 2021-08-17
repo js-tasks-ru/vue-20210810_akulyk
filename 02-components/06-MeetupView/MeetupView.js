@@ -6,6 +6,7 @@ import MeetupInfo from './components/MeetupInfo.js';
 import MeetupCover from './components/MeetupCover.js';
 import MeetupAgenda from './components/MeetupAgenda.js';
 
+
 export default defineComponent({
   name: 'MeetupView',
 

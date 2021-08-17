@@ -1,8 +1,8 @@
-import {defineComponent} from './vendor/vue.esm-browser.js';
+import { defineComponent } from './vendor/vue.esm-browser.js';
 import UiContainer from './UiContainer.js';
 import UiAlert from './UiAlert.js';
 import MeetupView from './components/MeetupView.js';
-import {fetchMeetupById} from './meetupService.js';
+import { fetchMeetupById } from './meetupService.js';
 
 export default defineComponent({
   name: 'PageMeetup',
@@ -30,6 +30,7 @@ export default defineComponent({
       async handler(value) {
         this.loading = true;
         this.meetup = null;
+        this.error = null;
         try {
           this.meetup = await fetchMeetupById(value);
         } catch (error) {

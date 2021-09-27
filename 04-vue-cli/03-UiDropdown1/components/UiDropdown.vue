@@ -1,19 +1,30 @@
 <template>
-  <div class="dropdown dropdown_opened">
-    <button type="button" class="dropdown__toggle dropdown__toggle_icon">
-      <ui-icon icon="tv" class="dropdown__icon" />
-      <span>Title</span>
+  <div class="dropdown" :class="{ dropdown_opened: show }">
+    <button type="button" class="dropdown__toggle" :class="{ dropdown__toggle_icon: hasIcon }" @click="showToggle">
+      <ui-icon v-if="icon" :icon="icon" class="dropdown__icon" />
+      <span>{{ label }}</span>
     </button>
 
-    <div class="dropdown__menu" role="listbox">
-      <button class="dropdown__item dropdown__item_icon" role="option" type="button">
-        <ui-icon icon="tv" class="dropdown__icon" />
-        Option 1
+    <div v-show="show" class="dropdown__menu" role="listbox">
+      <button
+        v-for="item in options"
+        :key="item.value"
+        class="dropdown__item"
+        :class="{ dropdown__item_icon: hasIcon }"
+        type="button"
+        role="option"
+        @click="handleClick(item.value)"
+      >
+        <ui-icon v-if="item.icon" class="dropdown__icon" :icon="item.icon" />
+        {{ item.text }}
       </button>
-      <button class="dropdown__item dropdown__item_icon" role="option" type="button">
-        <ui-icon icon="tv" class="dropdown__icon" />
-        Option 2
-      </button>
+    </div>
+    <div style="display: none">
+      <select v-model="localModelValue">
+        <option v-for="item in options" :key="'select-' + item.value" :value="item.value">
+          {{ item.text }}
+        </option>
+      </select>
     </div>
   </div>
 </template>
@@ -25,6 +36,62 @@ export default {
   name: 'UiDropdown',
 
   components: { UiIcon },
+  props: {
+    title: {
+      type: String,
+      required: true,
+    },
+    options: {
+      type: Array,
+      required: true,
+    },
+    modelValue: {},
+  },
+  emits: ['update:modelValue'],
+  data: () => ({
+    show: false,
+  }),
+  computed: {
+    localModelValue: {
+      get() {
+        return this.modelValue;
+      },
+      set(value) {
+        this.$emit('update:modelValue', value);
+      },
+    },
+    hasIcon() {
+      return this.options.some((item) => item.icon);
+    },
+    label() {
+      if (!this.modelValue) {
+        return this.title;
+      }
+      const selectedItem = this.findSelected(this.modelValue);
+      return selectedItem.text;
+    },
+    icon() {
+      if (this.modelValue) {
+        const selectedItem = this.findSelected(this.modelValue);
+        if (selectedItem && selectedItem.icon) {
+          return selectedItem.icon;
+        }
+      }
+      return null;
+    },
+  },
+  methods: {
+    handleClick(value) {
+      this.$emit('update:modelValue', value);
+      this.showToggle();
+    },
+    showToggle() {
+      this.show = !this.show;
+    },
+    findSelected(value) {
+      return this.options.find((item) => item.value === value);
+    },
+  },
 };
 </script>
 
